@@ -1,0 +1,9 @@
+node_modules/
+*.log
+dist/
+build/
+.env*
+.cache/
+coverage/
+midnight-devnet/
+*.tsbuildinfo 

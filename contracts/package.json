@@ -1,0 +1,15 @@
+{
+  "name": "@eliza/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "midnight compact build",
+    "test": "echo \"(contracts) no unit tests yet\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.6"
+  }
+} 
