@@ -4,7 +4,8 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "build": "midnight compact build",
+    "build": "compactc src/CharacterProof.compact build",
+    "deploy": "node scripts/deploy.js",
     "test": "echo \"(contracts) no unit tests yet\""
   },
   "dependencies": {},

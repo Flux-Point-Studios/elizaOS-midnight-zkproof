@@ -1,0 +1,53 @@
+import CompactStandardLibrary;
+
+// Character type definition (fixed-size vectors for simplicity)
+struct KnowledgeItem {
+  content: Bytes<64>,
+}
+
+// Reduced lengths (dev-net friendly, fits k=18)
+struct Character {
+  topics: Vector<8, Bytes<32>>,      // was 16
+  lore:   Vector<16, Bytes<64>>,     // was 32
+  bio:    Vector<4, Bytes<64>>,      // was 8
+  knowledge: Vector<8, KnowledgeItem>, // was 32
+}
+
+// Witness supplying the private character JSON parsed into the struct
+witness getCharacter(): Character;
+
+// Compact requires every branch to return the same type. Use one OR expression.
+circuit contains(arr: Vector<8, Bytes<32>>, query: Bytes<32>): Boolean {
+  return (arr[0] == query) || (arr[1] == query) || (arr[2] == query) || (arr[3] == query) ||
+         (arr[4] == query) || (arr[5] == query) || (arr[6] == query) || (arr[7] == query);
+}
+
+export circuit proveTopic(topic: Bytes<32>, committedHash: Bytes<32>): [] {
+  const char = getCharacter();
+  assert persistent_hash<Character>(char) == committedHash "commitment mismatch";
+
+  const ok = contains(char.topics, topic);
+  assert ok "topic missing";
+
+  disclose(committedHash);
+  disclose(ok);
+}
+
+export circuit proveNoPhrase(forbidden: Bytes<64>, committedHash: Bytes<32>): [] {
+  const char = getCharacter();
+  assert persistent_hash<Character>(char) == committedHash "commitment mismatch";
+
+  // Ensure forbidden phrase is absent in all relevant fields
+  for (const entry of char.lore) {
+    assert entry != forbidden "forbidden in lore";
+  }
+  for (const entry of char.bio) {
+    assert entry != forbidden "forbidden in bio";
+  }
+  for (const item of char.knowledge) {
+    assert item.content != forbidden "forbidden in knowledge";
+  }
+
+  disclose(committedHash);
+  disclose(true);
+} 
