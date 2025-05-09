@@ -4,13 +4,15 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "build": "compactc src/CharacterProof.compact build",
-    "deploy": "node scripts/deploy.js",
-    "test": "echo \"(contracts) no unit tests yet\""
+    "build": "compactc src/*.compact build",
+    "deploy": "tsx scripts/deploy.ts",
+    "test": "jest --config ../jest.config.js"
   },
   "dependencies": {},
   "devDependencies": {
     "typescript": "^5.3.3",
-    "@types/node": "^20.10.6"
+    "@types/node": "^20.10.6",
+    "@types/jest": "^29.5.4",
+    "tsx": "^4.7.0"
   }
 } 

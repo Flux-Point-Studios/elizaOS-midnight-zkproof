@@ -1,0 +1,27 @@
+// Character commitment registry – lets clients attest to a hash once
+import CompactStandardLibrary;
+
+module CharacterRegistry {
+
+  // Global mapping from commitment hash → bool (UTxO-backed storage)
+  export ledger commitments: Map<Bytes<32>, Boolean>;
+
+  /**
+   * Register a new character commitment.
+   * If the hash already exists this simply overwrites the same value.
+   */
+  export circuit registerCharacterHash(committedHash: Bytes<32>): [] {
+    commitments.insert(committedHash, true);
+    disclose(committedHash);
+  }
+
+  /**
+   * Query whether a commitment hash has already been registered.
+   */
+  export circuit hasCharacter(committedHash: Bytes<32>): Boolean {
+    let exists = commitments.contains(committedHash);
+    disclose(committedHash);
+    disclose(exists);
+    return exists;
+  }
+} 

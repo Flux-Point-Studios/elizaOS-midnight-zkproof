@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "test": "echo \"(dapp) no tests yet\""
+    "test": "jest --config ../jest.config.js"
   },
   "dependencies": {
     "@midnight-ntwrk/dapp-connector-api": "latest",
@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "typescript": "^5.3.3",
-    "@types/node": "^20.10.6"
+    "@types/node": "^20.10.6",
+    "@types/jest": "^29.5.4"
   }
 } 
