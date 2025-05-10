@@ -14,3 +14,25 @@ Follow the quick-start in `PLAN.md` or the full instructions in `docs/architectu
 ```bash
 pnpm dapp:prove-topic Cardano ./examples/character.json
 ```
+
+### Run the Midnight dev-net via Docker
+
+If you would rather avoid installing the Midnight CLI natively you can spin-up a single-node dev-net (node + proof-server) as a Docker container instead:
+
+```bash
+# pulls the latest public image & runs it in the background
+#   ‑ container name matches what the helper scripts expect ("midnight-dev")
+#   ‑ ports 8090 (RPC) and 6300 (proof-server) are forwarded to the host
+#   ‑ remove --detach (-d) if you want to tail the logs in the foreground
+
+docker run -d --name midnight-dev -p 8090:8090 -p 6300:6300 midnightnetwork/devnet:latest
+```
+
+Once the container is healthy you can continue with the normal workflow (build → deploy → prove) from another terminal:
+
+```bash
+pnpm contracts:deploy             # compiles & deploys contracts to the containerised chain
+pnpm dapp:prove-topic Cardano ./examples/character.json
+```
+
+To stop and remove the local chain just run `docker rm -f midnight-dev`.

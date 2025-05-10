@@ -19,9 +19,10 @@ module CharacterRegistry {
    * Query whether a commitment hash has already been registered.
    */
   export circuit hasCharacter(committedHash: Bytes<32>): Boolean {
-    let exists = commitments.contains(committedHash);
+    const exists: Boolean = commitments.lookup(committedHash);
+
     disclose(committedHash);
     disclose(exists);
     return exists;
   }
-} 
+}

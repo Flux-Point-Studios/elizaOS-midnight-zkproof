@@ -41,6 +41,10 @@ importers:
         version: 29.3.2(@babel/core@7.27.1)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.27.1))(jest@29.7.0(@types/node@20.17.32))(typescript@5.8.3)
 
   contracts:
+    dependencies:
+      '@midnight-ntwrk/midnight-js-contracts':
+        specifier: 0.1.10
+        version: 0.1.10
     devDependencies:
       '@types/jest':
         specifier: ^29.5.4
@@ -495,6 +499,9 @@ packages:
   '@midnight-ntwrk/ledger@2.0.8':
     resolution: {integrity: sha512-Kf6st/dQeRDX94qbEvpxh1bAxbIGpTriwn+gw0Yk0D6JJQHf057QIFKjHKiomu2I31ca6x/Ne12EBVkxe6DdtQ==}
 
+  '@midnight-ntwrk/midnight-js-contracts@0.1.10':
+    resolution: {integrity: sha512-edeqpsESnUJXRK8ndmo4QOLFkdhX/+6S7DDAvTwtEE5ye8pcEjLiErf/lFXX05VGu6/e12lTejx7CsynMX4SUQ==}
+
   '@midnight-ntwrk/midnight-js-contracts@0.1.11':
     resolution: {integrity: sha512-BtLm/OsDmhaN684C1hf9LX1V23EO3J8ZMaj9/0g9YmQ5rawpYZOhk45mjVWJiPxWL1sz1z1ZR6Jfa52j03V+AA==}
 
@@ -503,6 +510,9 @@ packages:
 
   '@midnight-ntwrk/midnight-js-network-id@0.1.11':
     resolution: {integrity: sha512-zcHdgHw+no94VnkOe5uHy2GhAbK4FaYeK2OPwvd7hiuhYxjCQLtdDvKocyrg2z+UZakbC9ae/JoaAErV9Tzs7A==}
+
+  '@midnight-ntwrk/midnight-js-types@0.1.10':
+    resolution: {integrity: sha512-ulxi6FRQSv8MTzs8h4xoO2pXWVjGs483uOG21vZ1JY1XD/CTZMExZcgwri+PnOmLxFpATpsXhg6B+Q5LhKfbSQ==}
 
   '@midnight-ntwrk/midnight-js-types@0.1.11':
     resolution: {integrity: sha512-Ro8Rf740fzr2sQnYvjkp7ziWqDsuRqaBCXOQ1WYNEoh9/TlYzvOY82c0mYzDlZWLGRxmncoITEojYHJ88pDdSA==}
@@ -1954,6 +1964,10 @@ snapshots:
 
   '@midnight-ntwrk/ledger@2.0.8': {}
 
+  '@midnight-ntwrk/midnight-js-contracts@0.1.10':
+    dependencies:
+      '@midnight-ntwrk/midnight-js-types': 0.1.10
+
   '@midnight-ntwrk/midnight-js-contracts@0.1.11':
     dependencies:
       '@midnight-ntwrk/midnight-js-types': 0.1.11
@@ -1968,6 +1982,10 @@ snapshots:
       - encoding
 
   '@midnight-ntwrk/midnight-js-network-id@0.1.11': {}
+
+  '@midnight-ntwrk/midnight-js-types@0.1.10':
+    dependencies:
+      rxjs: 7.8.2
 
   '@midnight-ntwrk/midnight-js-types@0.1.11':
     dependencies:

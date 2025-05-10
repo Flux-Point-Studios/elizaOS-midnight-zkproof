@@ -2,7 +2,7 @@
 import { execSync } from "child_process";
 import path from "path";
 import fs from "fs";
-import { ContractRuntime } from "@midnight-ntwrk/midnight-js-contracts";
+import { deployContract, waitForTx } from "@midnight-ntwrk/midnight-js-contracts";
 import { TESTNET_ID } from "@midnight-ntwrk/midnight-js-network-id";
 import { httpClientProofProvider } from "@midnight-ntwrk/midnight-js-http-client-proof-provider";
 
@@ -39,19 +39,6 @@ function ensureCompactc(): string {
   process.exit(1);
 }
 
-// Helper to load bytecode from either *.bytecode (raw hex) or *.contract (JSON)
-function loadBytecode(filePath: string): string {
-  if (filePath.endsWith(".bytecode")) {
-    const hex = fs.readFileSync(filePath, "utf-8").trim();
-    return hex.startsWith("0x") ? hex : `0x${hex}`;
-  }
-  // assume .contract json structure { "bytecode": "0x..." }
-  const json = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-  const hex = json.bytecode ?? json.byteCode ?? json.code ?? "";
-  if (!hex) throw new Error(`bytecode missing in ${filePath}`);
-  return hex.startsWith("0x") ? hex : `0x${hex}`;
-}
-
 // Simple deploy helper – assumes Midnight CLI installed & devnet running
 export async function deploy() {
   const rootDir = path.resolve(__dirname, "..", "..");
@@ -63,33 +50,40 @@ export async function deploy() {
   // Ensure build dir exists
   if (!fs.existsSync(buildDir)) fs.mkdirSync(buildDir, { recursive: true });
 
-  // 1. (Re)compile all Compact sources → .contract files
+  // 1. (Re)compile all Compact sources → .zkir files
   for (const file of fs.readdirSync(srcDir)) {
     if (!file.endsWith(".compact")) continue;
     const srcPath = path.join(srcDir, file);
+    // compactc 0.22 only needs the source + output dir (flags must precede path but we pass none)
     run(`${COMPILE} ${srcPath} ${buildDir}`);
   }
 
   // 2. Deploy every compiled artefact via JS SDK
-  const runtime = new ContractRuntime({
-    networkId: TESTNET_ID,
-    proofProvider: httpClientProofProvider({ url: process.env.PROOF_URL ?? "http://localhost:6300" }),
-  });
+  const proofUrl = process.env.PROOF_URL ?? "http://localhost:6300";
+  const proofProvider = httpClientProofProvider(proofUrl);
 
   const addresses: Record<string, string> = {};
 
-  for (const file of fs.readdirSync(buildDir)) {
-    if (!(file.endsWith(".bytecode") || file.endsWith(".contract"))) continue;
+  // compactc writes .zkir files into a "zkir" subfolder inside the output dir
+  const artefactsDir = path.join(buildDir, "zkir");
+  if (!fs.existsSync(artefactsDir)) {
+    console.warn(`⚠️  No .zkir artefacts found at ${artefactsDir}`);
+  }
 
-    const artefactPath = path.join(buildDir, file);
-    const name = path.basename(file).replace(/\.(bytecode|contract)$/, "");
-    const bytecode = loadBytecode(artefactPath);
+  for (const file of (fs.existsSync(artefactsDir) ? fs.readdirSync(artefactsDir) : [])) {
+    if (!file.endsWith(".zkir")) continue;
+
+    const zkirPath = path.join(artefactsDir, file);
+    const name = path.basename(file, ".zkir");
 
     try {
-      // eslint-disable-next-line no-await-in-loop
-      const { address } = await runtime.deploy({ bytecode });
-      addresses[name] = address;
-      console.log(`→ ${name} deployed at ${address}`);
+      const { stdout } = run(
+        `midnight-cli deploy-contract ${zkirPath} --json`,
+        /* capture */ true
+      )!;
+      const { contractAddress, txHash } = JSON.parse(stdout);
+      console.log(`→ ${name} deployed  tx ${txHash}  addr ${contractAddress}`);
+      addresses[name] = contractAddress;
     } catch (err) {
       console.error(`✖ failed to deploy ${name}:`, err);
     }
